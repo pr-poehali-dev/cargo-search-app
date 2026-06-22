@@ -49,10 +49,13 @@ def handler(event: dict, context) -> dict:
             'body': json.dumps({'error': 'messages required'})
         }
 
-    client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+    client = OpenAI(
+        api_key=os.environ['GROQ_API_KEY'],
+        base_url='https://api.groq.com/openai/v1'
+    )
 
     response = client.chat.completions.create(
-        model='gpt-4o-mini',
+        model='llama-3.3-70b-versatile',
         messages=[{'role': 'system', 'content': SYSTEM_PROMPT}] + messages,
         max_tokens=600,
         temperature=0.7,

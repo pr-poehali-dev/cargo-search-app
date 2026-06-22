@@ -4,6 +4,7 @@ import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import AiAssistant from '@/components/AiAssistant';
 import { Progress } from '@/components/ui/progress';
 
 const stats = [
@@ -276,6 +277,7 @@ const Dashboard = () => {
           </div>
         )}
       </section>
+      <AiAssistant />
     </div>
   );
 };
