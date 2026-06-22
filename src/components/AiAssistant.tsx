@@ -29,10 +29,49 @@ const BODY_RATES: Record<string, [number, number]> = {
   контейнер: [85, 115],
 };
 
+// Расходы на км для расчёта себестоимости
+const COST_PER_KM: Record<string, number> = {
+  тент: 42, реф: 58, рефрижератор: 58, изотерм: 50,
+  борт: 38, открытый: 38, контейнер: 45,
+};
+
+// Фиксированные затраты на рейс (зарплата, суточные, прочее)
+const FIXED_COST = 8000;
+
+function findTonnage(text: string): number | null {
+  const m = text.match(/(\d+)\s*т(?:онн)?/i);
+  return m ? parseInt(m[1]) : null;
+}
+
+function calcOwnerRate(km: number, body: string, tonnage: number | null): string {
+  const [lo, hi] = BODY_RATES[body] || [80, 110];
+  const costPerKm = COST_PER_KM[body] || 42;
+
+  // Себестоимость рейса
+  const fuelCost = Math.round(km * costPerKm / 1000) * 1000;
+  const totalCost = fuelCost + FIXED_COST;
+
+  // Минимальная прибыльная ставка = себестоимость + 25% маржа
+  const minProfit = Math.round(totalCost * 1.25 / 500) * 500;
+
+  // Рыночная ставка
+  const mktMin = Math.max(15000, Math.round(km * lo / 1000) * 1000);
+  const mktMax = Math.max(15000, Math.round(km * hi / 1000) * 1000);
+  const mktRec = Math.round((mktMin + mktMax) / 2 / 500) * 500;
+
+  // Чистая прибыль
+  const profit = mktRec - totalCost;
+  const margin = Math.round((profit / mktRec) * 100);
+
+  const tonnageStr = tonnage ? `, ${tonnage}т` : '';
+
+  return `**Расчёт для собственника (${body}${tonnageStr}, ${km} км):**\n\n📦 **Себестоимость рейса:**\n• Топливо и расходники: ~${fuelCost.toLocaleString('ru')} ₽\n• Зарплата, суточные: ~${FIXED_COST.toLocaleString('ru')} ₽\n• Итого затрат: **${totalCost.toLocaleString('ru')} ₽**\n\n📊 **Рыночная ставка:**\n• Диапазон: ${mktMin.toLocaleString('ru')} – ${mktMax.toLocaleString('ru')} ₽\n• Рекомендую брать: **${mktRec.toLocaleString('ru')} ₽**\n\n💰 **Ваша прибыль:**\n• Чистыми: ~${profit.toLocaleString('ru')} ₽ (маржа ${margin}%)\n• Минимум «в ноль»+25%: ${minProfit.toLocaleString('ru')} ₽\n\n⚠️ Ниже ${minProfit.toLocaleString('ru')} ₽ — работа в убыток!`;
+}
+
 const QUICK = [
-  'Какая ставка Москва → Питер, тент 20т?',
-  'Что выгоднее везти из Москвы в Казань?',
-  'Когда лучше брать груз на Екатеринбург?',
+  'Рассчитай мою прибыль: Москва → Питер, тент 20т',
+  'Какая ставка Москва → Казань, тент?',
+  'Что выгоднее везти из Москвы?',
   'Как торговаться с грузоотправителем?',
 ];
 
@@ -63,11 +102,34 @@ function calcRate(km: number, body: string): string {
   return `**Расчёт ставки (${body}, ${km} км):**\n• Рыночный диапазон: ${min.toLocaleString('ru')} – ${max.toLocaleString('ru')} ₽\n• Рекомендую просить: **${rec.toLocaleString('ru')} ₽**\n• Ставка за км: ${lo}–${hi} руб/км\n\n💡 Срочный груз → +15–25%. Попутная загрузка → −20–30%.`;
 }
 
+function isOwnerQuery(t: string): boolean {
+  return (
+    t.includes('прибыл') || t.includes('заработ') || t.includes('доход') ||
+    t.includes('себестоим') || t.includes('расход') || t.includes('затрат') ||
+    t.includes('собственник') || t.includes('моя прибыль') || t.includes('выгодн') ||
+    t.includes('чистыми') || t.includes('в карман') || t.includes('рассчитай мою')
+  );
+}
+
 function getReply(text: string): string {
   const t = text.toLowerCase();
   const km = findDistance(text);
   const body = findBody(text);
+  const tonnage = findTonnage(text);
 
+  // Расчёт для собственника — прибыль и себестоимость
+  if (isOwnerQuery(t)) {
+    if (km && body) return calcOwnerRate(km, body, tonnage);
+    if (km && !body) {
+      return `Понял — считаю прибыль для **${km} км**. Уточни тип кузова:\n• Тент, Борт, Изотерм, Рефрижератор, Контейнер\n\nНапример: «тент 20т».`;
+    }
+    if (!km && body) {
+      return `Тип кузова — **${body}**. Укажи маршрут или расстояние, и посчитаю твою чистую прибыль.\n\nПример: «Москва — Питер, тент 20т».`;
+    }
+    return `Для расчёта прибыли собственника укажи:\n• **Маршрут** — например «Москва → Екатеринбург»\n• **Тип кузова** — тент, реф, борт...\n• **Тоннаж** (необязательно) — 20т\n\nПример: «рассчитай прибыль Москва → Казань тент 20т»`;
+  }
+
+  // Обычный расчёт рыночной ставки
   if (km && body) return calcRate(km, body);
 
   if (km && !body) {
@@ -112,7 +174,7 @@ function renderText(text: string) {
 const AiAssistant = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: 'Привет! Я помогу найти лучшую ставку.\n\nНапиши маршрут и тип кузова — например: **«Москва → Питер, тент 20т»** — и я мгновенно рассчитаю диапазон цен.' }
+    { role: 'assistant', text: 'Привет! Я помогу найти лучшую ставку и рассчитать прибыль.\n\n🚛 **Для перевозчика:** напиши маршрут и тип кузова — рассчитаю рыночную ставку.\n\n💰 **Для собственника авто:** напиши «рассчитай прибыль Москва → Питер, тент 20т» — покажу себестоимость, ставку и чистый доход с рейса.' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
