@@ -116,15 +116,10 @@ const Index = () => {
             </span>
           </div>
           <nav className="hidden items-center gap-8 md:flex">
-            {['Грузы', 'Транспорт', 'Тарифы', 'О платформе'].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item}
-              </a>
-            ))}
+            <a href="#" className="text-sm font-medium text-primary">Грузы</a>
+            <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">Транспорт</a>
+            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">Тарифы</Link>
+            <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">О платформе</a>
           </nav>
           <div className="flex items-center gap-3">
             <button className="relative text-muted-foreground transition-colors hover:text-primary">

@@ -90,9 +90,9 @@ const Dashboard = () => {
             <a href="#" className="text-sm font-medium text-primary">
               Кабинет
             </a>
-            <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
+            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">
               Тарифы
-            </a>
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <button className="relative text-muted-foreground hover:text-primary">
