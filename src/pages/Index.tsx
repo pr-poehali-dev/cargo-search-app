@@ -9,64 +9,76 @@ import { Badge } from '@/components/ui/badge';
 
 const cargos = [
   {
-    id: 1,
-    from: 'Москва',
-    to: 'Санкт-Петербург',
-    distance: '710 км',
-    type: 'Стройматериалы',
-    weight: '20 т',
-    volume: '82 м³',
-    price: '58 000 ₽',
-    date: 'Сегодня',
-    rating: 4.9,
-    company: 'СтройЛогистик',
-    body: 'Тент',
-    hot: true,
+    id: 1, from: 'Москва', to: 'Санкт-Петербург', distance: '710 км',
+    type: 'Стройматериалы', weight: '20 т', volume: '82 м³',
+    price: '58 000 ₽', date: 'Сегодня', rating: 4.9,
+    company: 'СтройЛогистик', body: 'Тент', category: 'tent', hot: true,
   },
   {
-    id: 2,
-    from: 'Казань',
-    to: 'Екатеринбург',
-    distance: '980 км',
-    type: 'Продукты питания',
-    weight: '12 т',
-    volume: '45 м³',
-    price: '74 500 ₽',
-    date: 'Завтра',
-    rating: 4.7,
-    company: 'ВолгаТранс',
-    body: 'Рефрижератор',
-    hot: false,
+    id: 2, from: 'Казань', to: 'Екатеринбург', distance: '980 км',
+    type: 'Продукты питания', weight: '12 т', volume: '45 м³',
+    price: '74 500 ₽', date: 'Завтра', rating: 4.7,
+    company: 'ВолгаТранс', body: 'Рефрижератор', category: 'ref', hot: false,
   },
   {
-    id: 3,
-    from: 'Новосибирск',
-    to: 'Омск',
-    distance: '650 км',
-    type: 'Оборудование',
-    weight: '8 т',
-    volume: '30 м³',
-    price: '41 000 ₽',
-    date: 'Сегодня',
-    rating: 5.0,
-    company: 'СибирьКарго',
-    body: 'Изотерм',
-    hot: true,
+    id: 3, from: 'Новосибирск', to: 'Омск', distance: '650 км',
+    type: 'Медикаменты', weight: '4 т', volume: '18 м³',
+    price: '52 000 ₽', date: 'Сегодня', rating: 5.0,
+    company: 'СибирьКарго', body: 'Изотерм', category: 'ref', hot: true,
   },
   {
-    id: 4,
-    from: 'Краснодар',
-    to: 'Ростов-на-Дону',
-    distance: '275 км',
-    type: 'Сельхозпродукция',
-    weight: '22 т',
-    volume: '90 м³',
-    price: '32 000 ₽',
-    date: 'Завтра',
-    rating: 4.8,
-    company: 'ЮгАгро',
-    body: 'Тент',
-    hot: false,
+    id: 4, from: 'Краснодар', to: 'Ростов-на-Дону', distance: '275 км',
+    type: 'Зерно', weight: '22 т', volume: '90 м³',
+    price: '32 000 ₽', date: 'Завтра', rating: 4.8,
+    company: 'ЮгАгро', body: 'Зерновоз', category: 'open', hot: false,
+  },
+  {
+    id: 5, from: 'Москва', to: 'Воронеж', distance: '520 км',
+    type: 'Мебель и интерьер', weight: '6 т', volume: '60 м³',
+    price: '38 000 ₽', date: 'Сегодня', rating: 4.6,
+    company: 'МебельТранс', body: 'Тент', category: 'tent', hot: true,
+  },
+  {
+    id: 6, from: 'Уфа', to: 'Самара', distance: '460 км',
+    type: 'Металлопрокат', weight: '18 т', volume: '40 м³',
+    price: '44 000 ₽', date: 'Сегодня', rating: 4.9,
+    company: 'УралМеталл', body: 'Борт', category: 'open', hot: false,
+  },
+  {
+    id: 7, from: 'Москва', to: 'Нижний Новгород', distance: '410 км',
+    type: 'Электроника', weight: '3 т', volume: '22 м³',
+    price: '29 500 ₽', date: 'Завтра', rating: 4.8,
+    company: 'ТехноЭкспресс', body: 'Тент', category: 'tent', hot: false,
+  },
+  {
+    id: 8, from: 'Санкт-Петербург', to: 'Москва', distance: '710 км',
+    type: 'Химическая продукция', weight: '15 т', volume: '55 м³',
+    price: '67 000 ₽', date: 'Сегодня', rating: 4.7,
+    company: 'ХимТранс', body: 'Цистерна', category: 'special', hot: true,
+  },
+  {
+    id: 9, from: 'Екатеринбург', to: 'Новосибирск', distance: '1420 км',
+    type: 'Промышленное оборудование', weight: '14 т', volume: '50 м³',
+    price: '112 000 ₽', date: 'Завтра', rating: 5.0,
+    company: 'УралМаш', body: 'Тент', category: 'tent', hot: false,
+  },
+  {
+    id: 10, from: 'Москва', to: 'Казань', distance: '820 км',
+    type: 'Автозапчасти', weight: '9 т', volume: '38 м³',
+    price: '61 000 ₽', date: 'Сегодня', rating: 4.6,
+    company: 'АвтоДеталь', body: 'Тент', category: 'tent', hot: true,
+  },
+  {
+    id: 11, from: 'Ростов-на-Дону', to: 'Москва', distance: '1230 км',
+    type: 'Свежие овощи и фрукты', weight: '10 т', volume: '42 м³',
+    price: '93 000 ₽', date: 'Сегодня', rating: 4.9,
+    company: 'ЮгФреш', body: 'Рефрижератор', category: 'ref', hot: true,
+  },
+  {
+    id: 12, from: 'Новосибирск', to: 'Красноярск', distance: '750 км',
+    type: 'Лесоматериалы', weight: '24 т', volume: '95 м³',
+    price: '56 500 ₽', date: 'Завтра', rating: 4.5,
+    company: 'СибЛес', body: 'Борт', category: 'open', hot: false,
   },
 ];
 
@@ -77,8 +89,18 @@ const stats = [
   { value: '63', label: 'Региона РФ' },
 ];
 
+const CARGO_CATEGORIES = [
+  { id: 'all', label: 'Все грузы', icon: 'LayoutGrid' },
+  { id: 'tent', label: 'Тент / Изотерм', icon: 'Tent' },
+  { id: 'ref', label: 'Рефрижератор', icon: 'Thermometer' },
+  { id: 'open', label: 'Борт / Открытый', icon: 'Container' },
+  { id: 'special', label: 'Спецтранспорт', icon: 'FlaskConical' },
+  { id: 'hot', label: 'Срочные', icon: 'Flame' },
+];
+
 const Index = () => {
   const [cargoType, setCargoType] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -208,30 +230,35 @@ const Index = () => {
               Актуальные заявки от проверенных грузоотправителей
             </p>
           </div>
-          <div className="flex gap-2 rounded-lg bg-secondary p-1">
-            {[
-              { id: 'all', label: 'Все' },
-              { id: 'hot', label: 'Срочные' },
-              { id: 'near', label: 'Рядом' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setCargoType(tab.id)}
-                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-                  cargoType === tab.id
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-primary'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="text-sm text-muted-foreground">
+            Найдено: <span className="font-semibold text-primary">
+              {cargos.filter(c => cargoType === 'all' ? true : cargoType === 'hot' ? c.hot : c.category === cargoType).length}
+            </span> заявок
           </div>
+        </div>
+
+        {/* Category filters */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {CARGO_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => { setCargoType(cat.id); setVisibleCount(6); }}
+              className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                cargoType === cat.id
+                  ? 'border-accent bg-accent text-accent-foreground shadow-sm'
+                  : 'border-border bg-card text-muted-foreground hover:border-primary hover:text-primary'
+              }`}
+            >
+              <Icon name={cat.icon} size={14} />
+              {cat.label}
+            </button>
+          ))}
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {cargos
-            .filter((c) => (cargoType === 'hot' ? c.hot : true))
+            .filter((c) => cargoType === 'all' ? true : cargoType === 'hot' ? c.hot : c.category === cargoType)
+            .slice(0, visibleCount)
             .map((cargo, i) => (
               <Card
                 key={cargo.id}
@@ -321,6 +348,23 @@ const Index = () => {
               </Card>
             ))}
         </div>
+
+        {/* Показать ещё */}
+        {(() => {
+          const filtered = cargos.filter(c => cargoType === 'all' ? true : cargoType === 'hot' ? c.hot : c.category === cargoType);
+          return filtered.length > visibleCount ? (
+            <div className="mt-8 text-center">
+              <Button
+                variant="outline"
+                className="border-border px-8"
+                onClick={() => setVisibleCount(v => v + 4)}
+              >
+                Показать ещё ({filtered.length - visibleCount} заявок)
+                <Icon name="ChevronDown" size={16} className="ml-2" />
+              </Button>
+            </div>
+          ) : null;
+        })()}
       </section>
 
       {/* Features */}
