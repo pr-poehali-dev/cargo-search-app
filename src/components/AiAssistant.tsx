@@ -69,8 +69,8 @@ function calcOwnerRate(km: number, body: string, tonnage: number | null): string
 }
 
 const QUICK = [
-  'Рассчитай мою прибыль: Москва → Питер, тент 20т',
-  'Какая ставка Москва → Казань, тент?',
+  'Москва → Питер, тент 20т, туда и обратно',
+  'Рассчитай прибыль: Москва → Казань, тент 20т',
   'Что выгоднее везти из Москвы?',
   'Как торговаться с грузоотправителем?',
 ];
@@ -102,6 +102,37 @@ function calcRate(km: number, body: string): string {
   return `**Расчёт ставки (${body}, ${km} км):**\n• Рыночный диапазон: ${min.toLocaleString('ru')} – ${max.toLocaleString('ru')} ₽\n• Рекомендую просить: **${rec.toLocaleString('ru')} ₽**\n• Ставка за км: ${lo}–${hi} руб/км\n\n💡 Срочный груз → +15–25%. Попутная загрузка → −20–30%.`;
 }
 
+function calcRoundTrip(km: number, body: string, tonnage: number | null): string {
+  const [lo, hi] = BODY_RATES[body] || [80, 110];
+  const costPerKm = COST_PER_KM[body] || 42;
+  const tonnageStr = tonnage ? `, ${tonnage}т` : '';
+
+  // Туда (полный)
+  const costThere = Math.round(km * costPerKm / 1000) * 1000 + FIXED_COST;
+  const mktThere = Math.round(((km * lo + km * hi) / 2) / 500) * 500;
+  const mktThereMin = Math.max(15000, Math.round(km * lo / 1000) * 1000);
+  const mktThereMax = Math.max(15000, Math.round(km * hi / 1000) * 1000);
+  const profitThere = Math.max(0, mktThere - costThere);
+
+  // Обратно (попутная загрузка −25% к ставке, −15% к расходам т.к. маршрут известен)
+  const costBack = Math.round(km * costPerKm * 0.85 / 1000) * 1000 + FIXED_COST;
+  const mktBackFull = mktThere;
+  const mktBackDiscount = Math.round(mktBackFull * 0.75 / 500) * 500;
+  const profitBack = Math.max(0, mktBackDiscount - costBack);
+
+  // Итого за круговой рейс
+  const totalCost = costThere + costBack;
+  const totalRevenue = mktThere + mktBackDiscount;
+  const totalProfit = totalRevenue - totalCost;
+  const totalMargin = Math.round((totalProfit / totalRevenue) * 100);
+
+  // Если ехать порожним обратно
+  const emptyCost = Math.round(km * costPerKm * 0.85 / 1000) * 1000 + FIXED_COST;
+  const profitEmptyBack = profitThere - emptyCost;
+
+  return `**Расчёт туда и обратно (${body}${tonnageStr}, ${km} км):**\n\n➡️ **Туда (с грузом):**\n• Затраты: ~${costThere.toLocaleString('ru')} ₽\n• Ставка: ${mktThereMin.toLocaleString('ru')}–${mktThereMax.toLocaleString('ru')} ₽ → берём **${mktThere.toLocaleString('ru')} ₽**\n• Прибыль: **+${profitThere.toLocaleString('ru')} ₽**\n\n⬅️ **Обратно с попутным грузом** (−25% к ставке):\n• Затраты: ~${costBack.toLocaleString('ru')} ₽\n• Ставка попутная: **${mktBackDiscount.toLocaleString('ru')} ₽**\n• Прибыль: **+${profitBack.toLocaleString('ru')} ₽**\n\n🔄 **Итого за круговой рейс:**\n• Выручка: ${totalRevenue.toLocaleString('ru')} ₽\n• Затраты: ${totalCost.toLocaleString('ru')} ₽\n• Чистая прибыль: **${totalProfit.toLocaleString('ru')} ₽** (маржа ${totalMargin}%)\n\n⚠️ Если едешь обратно пустым: прибыль всего **${profitEmptyBack > 0 ? '+' : ''}${profitEmptyBack.toLocaleString('ru')} ₽** — попутный груз выгоднее на **${(totalProfit - profitEmptyBack).toLocaleString('ru')} ₽**!`;
+}
+
 function isOwnerQuery(t: string): boolean {
   return (
     t.includes('прибыл') || t.includes('заработ') || t.includes('доход') ||
@@ -116,6 +147,15 @@ function getReply(text: string): string {
   const km = findDistance(text);
   const body = findBody(text);
   const tonnage = findTonnage(text);
+
+  // Расчёт обратной загрузки / круговой рейс
+  const isRoundTrip = t.includes('обратн') || t.includes('туда') || t.includes('круговой') || t.includes('оба конца') || t.includes('туда и обратно');
+  if (isRoundTrip) {
+    if (km && body) return calcRoundTrip(km, body, tonnage);
+    if (km && !body) return `Маршрут — **${km} км**. Уточни тип кузова для расчёта туда и обратно:\n• Тент, Реф, Борт, Изотерм\n\nПример: «тент 20т».`;
+    if (!km && body) return `Тип кузова — **${body}**. Укажи маршрут, и посчитаю прибыль с обратной загрузкой.\n\nПример: «Москва → Казань, тент 20т, обратно».`;
+    return `Для расчёта с обратной загрузкой укажи маршрут и тип кузова.\n\nПример: «Москва → Екатеринбург, тент 20т, туда и обратно»`;
+  }
 
   // Расчёт для собственника — прибыль и себестоимость
   if (isOwnerQuery(t)) {
@@ -174,7 +214,7 @@ function renderText(text: string) {
 const AiAssistant = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: 'Привет! Я помогу найти лучшую ставку и рассчитать прибыль.\n\n🚛 **Для перевозчика:** напиши маршрут и тип кузова — рассчитаю рыночную ставку.\n\n💰 **Для собственника авто:** напиши «рассчитай прибыль Москва → Питер, тент 20т» — покажу себестоимость, ставку и чистый доход с рейса.' }
+    { role: 'assistant', text: 'Привет! Я помогу найти лучшую ставку и рассчитать прибыль.\n\n🚛 **Ставка по маршруту:** «Москва → Питер, тент 20т»\n💰 **Прибыль собственника:** «рассчитай прибыль Москва → Казань, тент»\n🔄 **Туда и обратно:** «Москва → Екатеринбург, тент 20т, обратно» — покажу выгоду от попутного груза vs пустой пробег.' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
