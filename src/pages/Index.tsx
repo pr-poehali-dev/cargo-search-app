@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -109,9 +110,11 @@ const Index = () => {
                 3
               </span>
             </button>
-            <Button variant="ghost" className="hidden text-primary sm:flex">
-              Войти
-            </Button>
+            <Link to="/dashboard">
+              <Button variant="ghost" className="hidden text-primary sm:flex">
+                Кабинет
+              </Button>
+            </Link>
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
               Регистрация
             </Button>
