@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "AI assistant responds",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "messages": [
+          { "role": "user", "content": "Какая ставка Москва — Питер, тент 20т?" }
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": { "reply": "string" },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
